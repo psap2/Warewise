@@ -1,9 +1,9 @@
 from flask import Flask, request, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from forms import ProductForm, SupplierForm
-from models import Product, Supplier, db
+from forms import ProductForm, SupplierForm, NewUserForm
+from models import Product, Supplier, Users, db
 import secrets
-
+from flask_login import LoginManager
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///inventory.db'
@@ -11,6 +11,44 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = secrets.token_hex(16)
 
 db.init_app(app)
+
+#Adding authentication to our app with Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+
+@login_manager.user_loader
+def load_user(user_id):
+    return Users.query.get(int(user_id))
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    form = NewUserForm()
+
+    if form.validate_on_submit():  
+        
+        existing_user = Users.query.filter((Users.username == form.username.data) | (Users.email == form.email.data)).first()
+
+        if existing_user:
+            flash('A user with this username/email already exists', 'error')
+            return render_template('register.html', form=form)
+
+        username = form.username.data
+        email = form.email.data
+        password = form.password.data
+        new_user = Users(username=username, email=email, password=password)
+        try:
+            db.session.add(new_user)
+            db.session.commit()
+            return redirect(url_for('login'))
+        except Exception as e:
+            db.session.rollback()
+            flash('Failed to register user due to an error: {}'.format(e), 'error')
+            return render_template('register.html', form=form)
+        
+    elif request.method == 'GET':
+        return render_template('register.html', form=form)
+
+
 
 @app.route('/')
 def index():

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, DecimalField, IntegerField, SubmitField
-from wtforms.validators import DataRequired, NumberRange
+from wtforms import StringField, DecimalField, IntegerField, SubmitField, PasswordField
+from wtforms.validators import DataRequired, NumberRange, Email, EqualTo
 
 class ProductForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(message="Please enter a product name.")])
@@ -20,5 +20,9 @@ class SupplierForm(FlaskForm):
     contact_info = StringField('Contact', validators=[DataRequired(message="Please provide an email for the supplier.")])
     submit = SubmitField('Add Supplier')
 
-
-
+class NewUserForm(FlaskForm):
+    username = StringField('Username', validators=[DataRequired(message="Please enter a username")])
+    email = StringField('Email', validators=[DataRequired(message="Please enter a proper email."), Email()])
+    password = PasswordField('Password', validators=[DataRequired(message="Please enter a password")])
+    confim_pasword = PasswordField('Confirm Password', validators=[DataRequired(message="Confirm password does not match"), EqualTo('password')])
+    submit = SubmitField('Register')
