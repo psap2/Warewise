@@ -24,5 +24,5 @@ class NewUserForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(message="Please enter a username")])
     email = StringField('Email', validators=[DataRequired(message="Please enter a proper email."), Email()])
     password = PasswordField('Password', validators=[DataRequired(message="Please enter a password")])
-    confim_pasword = PasswordField('Confirm Password', validators=[DataRequired(message="Confirm password does not match"), EqualTo('password')])
+    confirm_password = PasswordField('Confirm Password', validators=[DataRequired(message="Confirm password does not match"), EqualTo('password')])
     submit = SubmitField('Register')

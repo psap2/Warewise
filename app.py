@@ -53,8 +53,9 @@ def register():
 
 @app.route('/')
 def index():
-    # Displays the homepage
-    return render_template('index.html')
+    # Displays the homepage/register page
+    form = NewUserForm()
+    return render_template('register.html', form=form)
 
 @app.route('/products')
 def view_products():
